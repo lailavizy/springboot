@@ -33,6 +33,9 @@
         <el-form-item>
             <el-button type="primary" @click="search">查询</el-button>
         </el-form-item>
+        <el-form-item>
+            <el-button @click="resetForm">重置</el-button>
+        </el-form-item>
 
         <el-form-item>
             <el-button type="success" icon="el-icon-plus" @click="">添加</el-button>
@@ -110,6 +113,10 @@
             search(){
                 this.loadData();
             },
+            resetForm(){
+               this.queryForm.tid='';
+               this.loadData();
+            }
             /*//3. 添加部门
             addDept(){
                 //清空原来form
