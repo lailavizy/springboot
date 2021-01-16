@@ -20,7 +20,7 @@
              style="text-align: left;" class="demo-form-inline">
 
         <el-form-item label="类型" prop="tid">
-            <el-select v-model="allType.tid"  placeholder="请选择">
+            <el-select v-model="queryForm.tid"  placeholder="请选择" >
                 <el-option
                         v-for="item in allType"
                         :key="item.tid"
@@ -94,7 +94,7 @@
            loadData(){
                 var _this = this;
                 //初始化
-               axios.get('/filmInfo/queryAll',this.queryForm.tid)
+               axios.get('/filmInfo/queryAll?tid='+this.queryForm.tid)
                     .then(function (response) {
                         //正确请求时，回调函数
                         console.log(response);
