@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lai.dao.FilmInfoDao">
+
+    <resultMap type="com.lai.entity.FilmInfo" id="FilmInfoMap">
+        <result property="fid" column="fid" jdbcType="INTEGER"/>
+        <result property="fname" column="fname" jdbcType="VARCHAR"/>
+        <result property="type" column="type" jdbcType="INTEGER"/>
+        <result property="duration" column="duration" jdbcType="INTEGER"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="releasedate" column="releasedate" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="FilmInfoMap">
+        select
+          fid, fname, type, duration, remark, releasedate
+        from film.film_info
+        where fid = #{fid}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="FilmInfoMap">
+        select
+          fid, fname, type, duration, remark, releasedate
+        from film.film_info
+        limit #{offset}, #{limit}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="FilmInfoMap">
+        select
+        fid, fname, type, duration, remark, releasedate,tname
+        from film.film_info join  type_info on tid = type
+        <where>
+            <if test="fid != null">
+                and fid = #{fid}
+            </if>
+            <if test="fname != null and fname != ''">
+                and fname = #{fname}
+            </if>
+            <if test="type != null">
+                and type = #{type}
+            </if>
+            <if test="duration != null">
+                and duration = #{duration}
+            </if>
+            <if test="remark != null and remark != ''">
+                and remark = #{remark}
+            </if>
+            <if test="releasedate != null">
+                and releasedate = #{releasedate}
+            </if>
+        </where>
+
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="fid" useGeneratedKeys="true">
+        insert into film.film_info(fname, type, duration, remark, releasedate)
+        values (#{fname}, #{type}, #{duration}, #{remark}, #{releasedate})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="fid" useGeneratedKeys="true">
+        insert into film.film_info(fname, type, duration, remark, releasedate)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.fname}, #{entity.type}, #{entity.duration}, #{entity.remark}, #{entity.releasedate})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="fid" useGeneratedKeys="true">
+        insert into film.film_info(fname, type, duration, remark, releasedate)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.fname}, #{entity.type}, #{entity.duration}, #{entity.remark}, #{entity.releasedate})
+        </foreach>
+        on duplicate key update
+        fname = values(fname) , type = values(type) , duration = values(duration) , remark = values(remark) ,
+        releasedate = values(releasedate)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update film.film_info
+        <set>
+            <if test="fname != null and fname != ''">
+                fname = #{fname},
+            </if>
+            <if test="type != null">
+                type = #{type},
+            </if>
+            <if test="duration != null">
+                duration = #{duration},
+            </if>
+            <if test="remark != null and remark != ''">
+                remark = #{remark},
+            </if>
+            <if test="releasedate != null">
+                releasedate = #{releasedate},
+            </if>
+        </set>
+        where fid = #{fid}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from film.film_info where fid = #{fid}
+    </delete>
+
+</mapper>

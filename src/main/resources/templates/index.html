@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>电影</title>
+    <!--vue js-->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <!--elementui css js-->
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <!-- 引入组件库 -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <!--axios-->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+<div id="app">
+    <!--查询表单-->
+    <el-form :inline="true" ref="queryForm" :model="queryForm"
+             style="text-align: left;" class="demo-form-inline">
+
+        <el-form-item label="类型" prop="tid">
+            <el-select v-model="allType.tid"  placeholder="请选择">
+                <el-option
+                        v-for="item in allType"
+                        :key="item.tid"
+                        :label="item.tname"
+                        :value="item.tid">
+                </el-option>
+            </el-select>
+        </el-form-item>
+
+        <el-form-item>
+            <el-button type="primary" @click="search">查询</el-button>
+        </el-form-item>
+
+        <el-form-item>
+            <el-button type="success" icon="el-icon-plus" @click="">添加</el-button>
+        </el-form-item>
+    </el-form>
+    <!--查询表单-->
+    <!--表格数据-->
+    <el-table
+            :data="tableData"
+            :header-cell-style="{'text-align':'center'}"
+            :cell-style="{'text-align':'center'}"
+            style="width: 100%"
+    >
+        <el-table-column prop="fid" label="电影编号" width="80"></el-table-column>
+        <el-table-column prop="fname" label="名称" width="120"></el-table-column>
+        <el-table-column prop="tname" label="类型" width="180"></el-table-column>
+        <el-table-column prop="duration" label="时长" width="120"></el-table-column>
+        <el-table-column prop="remark" label="备注" width="280"></el-table-column>
+        <el-table-column prop="releasedate" label="上映时间" width="120"></el-table-column>
+
+        <el-table-column label="操作" width="300">
+            <template slot-scope="scope">
+                <el-button  type="primary" @click="editDept(scope.row)" size="small">编辑</el-button>
+                <el-button type="danger" size="small" disabled>删除</el-button>
+            </template>
+        </el-table-column>
+
+    </el-table>
+    <!--表格数据-->
+</div>
+</body>
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            tableData: [],
+            queryForm: {
+                tid:''
+            },
+            title: '添加',
+           // deptDialog: false,
+          //  deptForm: {},
+            allType:[],
+        },
+        created:function(){
+            //初始化
+            this.loadData();
+            var _this = this;
+            axios.get('/typeInfo/queryAll')
+                .then(function (response) {
+                    console.log(response);
+                    _this.allType = response.data;
+                }).catch(function (error) {
+                console.log(error);
+            });
+        },
+        methods: {
+            //1. 加载数据
+           loadData(){
+                var _this = this;
+                //初始化
+               axios.get('/filmInfo/queryAll',this.queryForm.tid)
+                    .then(function (response) {
+                        //正确请求时，回调函数
+                        console.log(response);
+                        _this.tableData = response.data;
+                        // _this.total = response.data.data.total;
+                    })
+                    .catch(function (error) {
+                        //失败处理
+                        console.log(error);
+                    });
+            },
+            //2. 查询方法
+            search(){
+                this.loadData();
+            },
+            /*//3. 添加部门
+            addDept(){
+                //清空原来form
+                this.deptForm={};
+                //更新显示名称
+                this.title="部门添加";
+                this.deptDialog=true;
+                this.dialogImageUrl.url=''
+            },
+            //4. 编辑部门
+            editDept(row){
+                this.title="部门编辑";
+                this.deptForm=JSON.parse(JSON.stringify(row));
+                this.deptDialog=true;
+                this.dialogImageUrl.url=this.deptForm.picpath
+            },
+            //5. 提交按钮
+            submitForm(){
+                var  url ='/dept/update';
+                if(this.deptForm.deptno==''||this.deptForm.deptno==null){
+                    url="/dept/add"
+                }
+                _this=this;
+                //提交方法
+                axios.post(url, this.deptForm)
+                    .then(function (response) {
+                        console.log(response);
+                        _this.deptDialog=false;
+                        //提示更新成功
+                        _this.$message({
+                            //  message: '恭喜你，这是一条成功消息',
+                            message: '操作成功',
+                            type: 'success'
+                        });
+                        //重新加载数据
+                        _this.loadData();
+                    })
+                    .catch(function (error) {
+                        _this.$message.error('错了哦，这是一条错误消息');
+                    });
+            },*/
+
+
+        }
+    })
+</script>
+</html>
