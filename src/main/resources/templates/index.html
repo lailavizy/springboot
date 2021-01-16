@@ -15,6 +15,52 @@
 </head>
 <body>
 <div id="app">
+    <!--添加/编辑部门弹出框-->
+    <el-dialog :title="title" :visible.sync="filmDialog" width="45%">
+        <el-form :model="filmForm" ref="filmForm"
+                 style="text-align:left" status-icon :rules="rules" label-position="right" label-width="80px"
+                 class="demo-ruleForm">
+
+            <el-form-item label="编号" prop="fid">
+                <el-input v-model="filmForm.fid" autocomplete="off" :disabled="true"  placeholder="自动生成"></el-input>
+            </el-form-item>
+            <el-form-item label="电影名称" prop="fname">
+                <el-input v-model="filmForm.fname" autocomplete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="类型" prop="tid">
+                <el-select v-model="filmForm.tid"  placeholder="请选择" >
+                    <el-option
+                            v-for="item in allType"
+                            :key="item.tid"
+                            :label="item.tname"
+                            :value="item.tid">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="时长" prop="duration">
+                <el-input v-model.number="filmForm.duration" autocomplete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="上映时间" prop="releasedate">
+                <el-date-picker
+                        v-model="filmForm.releasedate"
+                        type="date"
+                        placeholder="选择日期">
+                </el-date-picker>
+            </el-form-item>
+
+            <el-form-item label="简介" prop="remark">
+                <el-input v-model="filmForm.remark" autocomplete="off" type="textarea"  :autosize="{ minRows: 2, maxRows: 8}"></el-input>
+            </el-form-item>
+
+
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button type="primary" @click="submitForm">确定</el-button>
+            <el-button @click="cancel">取消</el-button>
+        </div>
+    </el-dialog>
+    <!--添加/编辑部门弹出框-->
+
     <!--查询表单-->
     <el-form :inline="true" ref="queryForm" :model="queryForm"
              style="text-align: left;" class="demo-form-inline">
@@ -38,7 +84,7 @@
         </el-form-item>
 
         <el-form-item>
-            <el-button type="success" icon="el-icon-plus" @click="">添加</el-button>
+            <el-button type="success" icon="el-icon-plus" @click="addFilm">添加</el-button>
         </el-form-item>
     </el-form>
     <!--查询表单-->
@@ -51,6 +97,7 @@
     >
         <el-table-column prop="fid" label="电影编号" width="80"></el-table-column>
         <el-table-column prop="fname" label="名称" width="120"></el-table-column>
+        <el-table-column prop="type" v-if="false"></el-table-column>
         <el-table-column prop="tname" label="类型" width="180"></el-table-column>
         <el-table-column prop="duration" label="时长" width="120"></el-table-column>
         <el-table-column prop="remark" label="备注" width="280"></el-table-column>
@@ -70,23 +117,48 @@
 <script>
     new Vue({
         el: '#app',
-        data: {
-            tableData: [],
-            queryForm: {
-                tid:''
-            },
-            title: '添加',
-           // deptDialog: false,
-          //  deptForm: {},
-            allType:[],
-        },
-        created:function(){
+        data(){
+            /* 检查用户名是否重复 */
+            var checkName = (rule, value, callback) => {
+                axios.post(`/filmInfo/checkName`, this.filmForm)
+                    .then(r => {
+                    //alert(r.data)
+                    if (r.data == 0) {
+                        callback(new Error('用户名重复，请修改'));
+                    } else {
+                        callback();
+                    }
+                })
+            };
+            return {
+                tableData: [],
+                queryForm: {
+                    tid: ''
+                },
+                title: '添加',
+                filmDialog: false,
+                filmForm: {},
+                allType: [],
+                /*表单验证*/
+                rules: {
+                    fname: [
+                        {validator: checkName, trigger: 'blur'},
+                        {required: true, message: '电影名称为必填项', trigger: 'blur'},//必填项验证
+                        {min: 1, max: 30, message: '长度在 1 到 30 个字符', trigger: 'blur'},//长度验证
+                    ],
+                    duration:[
+                        {required: true, message: '时长为必填项', trigger: 'blur'},
+                        { type: 'number', message: '时长必须为数字值'}
+                    ],
+                },
+
+    }},created:function(){
             //初始化
             this.loadData();
             var _this = this;
             axios.get('/typeInfo/queryAll')
                 .then(function (response) {
-                    console.log(response);
+                   // console.log(response);
                     _this.allType = response.data;
                 }).catch(function (error) {
                 console.log(error);
@@ -113,38 +185,46 @@
             search(){
                 this.loadData();
             },
+            //3.重置方法
             resetForm(){
                this.queryForm.tid='';
                this.loadData();
-            }
-            /*//3. 添加部门
-            addDept(){
-                //清空原来form
-                this.deptForm={};
-                //更新显示名称
-                this.title="部门添加";
-                this.deptDialog=true;
-                this.dialogImageUrl.url=''
             },
-            //4. 编辑部门
+            //3. 添加电影
+            addFilm(){
+                //更新显示名称
+                this.title="添加";
+                this.$nextTick(() => {
+                    this.$refs[`filmForm`].clearValidate();   //清空检验
+                    //清空原来form
+                    this.filmForm={};
+                });
+                this.filmDialog=true;
+            },
+           //4. 编辑部门
             editDept(row){
-                this.title="部门编辑";
-                this.deptForm=JSON.parse(JSON.stringify(row));
-                this.deptDialog=true;
-                this.dialogImageUrl.url=this.deptForm.picpath
+                this.title="编辑";
+                this.$nextTick(() => {
+                    this.$refs[`filmForm`].clearValidate();   //清空检验
+                    this.filmForm = JSON.parse(JSON.stringify(row));
+                   // console.log(this.filmForm);
+                    this.filmForm.tid= row.type;
+                    this.filmDialog = true;
+
+                })
             },
             //5. 提交按钮
             submitForm(){
-                var  url ='/dept/update';
-                if(this.deptForm.deptno==''||this.deptForm.deptno==null){
+                /*var  url ='/dept/update';
+                if(this.filmForm.deptno==''||this.filmForm.deptno==null){
                     url="/dept/add"
                 }
                 _this=this;
                 //提交方法
-                axios.post(url, this.deptForm)
+                axios.post(url, this.filmForm)
                     .then(function (response) {
                         console.log(response);
-                        _this.deptDialog=false;
+                        _this.filmDialog=false;
                         //提示更新成功
                         _this.$message({
                             //  message: '恭喜你，这是一条成功消息',
@@ -156,8 +236,12 @@
                     })
                     .catch(function (error) {
                         _this.$message.error('错了哦，这是一条错误消息');
-                    });
-            },*/
+                    });*/
+            },
+            //6.取消按钮
+            cancel(){
+              this.filmDialog =false;
+            },
 
 
         }

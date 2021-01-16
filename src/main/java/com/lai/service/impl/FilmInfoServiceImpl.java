@@ -88,4 +88,21 @@ public class FilmInfoServiceImpl implements FilmInfoService {
     public boolean deleteById(Integer fid) {
         return this.filmInfoDao.deleteById(fid) > 0;
     }
+
+    @Override
+    public int checkName(FilmInfo film) {
+        String list;
+        if(film.getFid() == null){
+            film.setFid(0);
+        }
+        list = this.filmInfoDao.checkName(film.getFname(),film.getFid());
+        System.out.println("filmInfoDao.checkName(fname,fid)========" + list);
+        if (list == null) {
+            System.out.println("用户不存在，可添加");
+            return 1;
+        } else {
+            System.out.println("用户已存在");
+        }
+        return 0;
+    }
 }

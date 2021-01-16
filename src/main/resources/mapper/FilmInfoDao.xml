@@ -54,6 +54,12 @@
         </where>
 
     </select>
+    <select id="checkName" resultType="java.lang.String">
+        select * from film_info where fname = #{fname}
+        <if test="fid!=0">
+            and fid != #{fid}
+        </if>
+    </select>
 
     <!--新增所有列-->
     <insert id="insert" keyProperty="fid" useGeneratedKeys="true">

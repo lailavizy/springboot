@@ -62,4 +62,5 @@ public interface FilmInfoService {
      */
     boolean deleteById(Integer fid);
 
+    int checkName(FilmInfo filmInfo);
 }

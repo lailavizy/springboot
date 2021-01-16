@@ -79,4 +79,5 @@ public interface FilmInfoDao {
      */
     int deleteById(Integer fid);
 
+    String checkName(@Param("fname") String fname,@Param("fid") Integer fid);
 }
