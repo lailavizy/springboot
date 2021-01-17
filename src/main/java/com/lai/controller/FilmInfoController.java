@@ -53,4 +53,25 @@ public class FilmInfoController {
     public int checkName(@RequestBody FilmInfo filmInfo){
        return this.filmInfoService.checkName(filmInfo);
     }
+
+    @PostMapping("add")
+    public FilmInfo add(@RequestBody FilmInfo filmInfo){
+        return this.filmInfoService.insert(filmInfo);
+    }
+
+    @PostMapping("update")
+    public FilmInfo update(@RequestBody FilmInfo filmInfo){
+        return this.filmInfoService.update(filmInfo);
+    }
+    /**
+     * 根据ID删除
+     * @param fid
+     * @return
+     */
+    @GetMapping("deleteById")
+    // @RequestMapping(method = RequestMethod.DELETE)
+    public boolean deleteById(Integer fid) {
+        return this.filmInfoService.deleteById(fid);
+    }
+
 }

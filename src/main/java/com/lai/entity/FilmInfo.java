@@ -38,6 +38,7 @@ public class FilmInfo implements Serializable {
     /**
      * 上映时间
      */
+    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
     private Date releasedate;
 
     private String tname;
