@@ -251,7 +251,7 @@
             delFilm(fid){
                 console.log(fid)
                 _this=this;
-                axios.get('/filmInfo/deleteById?fid='+fid)
+                axios.delete(`/filmInfo/deleteById/`+fid)
                     .then(function (response) {
                         console.log(response);
                         _this.$message.success('删除成功');

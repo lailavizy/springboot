@@ -63,14 +63,15 @@ public class FilmInfoController {
     public FilmInfo update(@RequestBody FilmInfo filmInfo){
         return this.filmInfoService.update(filmInfo);
     }
+
     /**
      * 根据ID删除
      * @param fid
      * @return
      */
-    @GetMapping("deleteById")
+    @DeleteMapping("deleteById/{fid}")
     // @RequestMapping(method = RequestMethod.DELETE)
-    public boolean deleteById(Integer fid) {
+    public boolean deleteById(@PathVariable("fid") Integer fid) {
         return this.filmInfoService.deleteById(fid);
     }
 
